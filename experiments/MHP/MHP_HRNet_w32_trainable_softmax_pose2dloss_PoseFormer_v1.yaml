@@ -1,0 +1,161 @@
+AUTO_RESUME: false
+CUDNN:
+  BENCHMARK: true
+  DETERMINISTIC: false
+  ENABLED: true
+EXP_NAME: 'MHP_HRNet_w32_trainable_softmax_pose2dloss_PoseFormer_v1'
+DATA_DIR: '../data'
+GPUS: (1,2,3)
+DISTRIBUTED: true
+OUTPUT_DIR: '../output'
+LOG_DIR: '../log'
+WORKERS: 0
+PRINT_FREQ: 1
+VERBOSE: false
+WITHOUT_EVAL: false
+WITH_DATA_AUG: false
+DATASET:
+  COLOR_RGB: true
+  BACKGROUND_DIR: ''
+  DATASET:
+  - 'MHP_seq'
+  TEST_DATASET:
+  - 'MHP_seq'
+  DATA_FORMAT: jpg
+  STRIDE: 2
+  SEQ_IDX:
+    - -4
+    - -3
+    - -2
+    - -1
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+  FLIP: true
+  NUM_JOINTS_HALF_BODY: 8
+  NUM_JOINTS: 21
+  PROB_HALF_BODY: 0.3
+  SIGMA: 2
+  ROT_FACTOR: 45
+  SCALE_FACTOR: 0.35
+  TEST_SET: 'evaluation'
+  TRAIN_SET: 'training'
+MODEL:
+  INIT_WEIGHTS: false
+  NAME: pose_hrnet_transformer
+  HRNET_PRETRAINED: ''
+  TARGET_TYPE: gaussian
+  IMAGE_SIZE:
+  - 256
+  - 256
+  HEATMAP_SIZE:
+  - 64
+  - 64
+  SIGMA: 2
+  EXTRA:
+    PRETRAINED_LAYERS:
+    - 'conv1'
+    - 'bn1'
+    - 'conv2'
+    - 'bn2'
+    - 'layer1'
+    - 'transition1'
+    - 'stage2'
+    - 'transition2'
+    - 'stage3'
+    - 'transition3'
+    - 'stage4'
+    FINAL_CONV_KERNEL: 1
+    STAGE2:
+      NUM_MODULES: 1
+      NUM_BRANCHES: 2
+      BLOCK: BASIC
+      NUM_BLOCKS:
+      - 4
+      - 4
+      NUM_CHANNELS:
+      - 32
+      - 64
+      FUSE_METHOD: SUM
+    STAGE3:
+      NUM_MODULES: 4
+      NUM_BRANCHES: 3
+      BLOCK: BASIC
+      NUM_BLOCKS:
+      - 4
+      - 4
+      - 4
+      NUM_CHANNELS:
+      - 32
+      - 64
+      - 128
+      FUSE_METHOD: SUM
+    STAGE4:
+      NUM_MODULES: 3
+      NUM_BRANCHES: 4
+      BLOCK: BASIC
+      NUM_BLOCKS:
+      - 4
+      - 4
+      - 4
+      - 4
+      NUM_CHANNELS:
+      - 32
+      - 64
+      - 128
+      - 256
+      FUSE_METHOD: SUM
+  HEATMAP_SOFTMAX: true
+  TRAINABLE_SOFTMAX: true
+  BACKBONE_NAME: 'pose_hrnet_softmax'
+  BACKBONE_MODEL_PATH: '../output/MHP/MHP_HRNet_w32_trainable_softmax_pose2dloss_v1/model_best.pth.tar'
+
+LOSS:
+  WITH_HEATMAP_LOSS: false
+  HEATMAP_LOSS_FACTOR: 1.0
+  WITH_POSE2D_LOSS: true
+  POSE2D_LOSS_FACTOR: 1.0
+  WITH_TIME_CONSISTENCY_LOSS: false
+  TIME_CONSISTENCY_LOSS_FACTOR: 1.0
+  WITH_BONE_LOSS: false
+  BONE_LOSS_FACTOR: 1.0
+  WITH_JOINTANGLE_LOSS: false
+  JOINTANGLE_LOSS_FACTOR: 1.0
+TRAIN:
+  IMAGES_PER_GPU: 1
+  SHUFFLE: true
+  BEGIN_EPOCH: 1
+  END_EPOCH: 6
+  OPTIMIZER: adam
+  LR: 0.001
+  LR_FACTOR: 0.5
+  LR_STEP:
+  - 16
+  - 32
+  - 48
+  WD: 0.0001
+  GAMMA1: 0.99
+  GAMMA2: 0.0
+  MOMENTUM: 0.9
+  NESTEROV: false
+TEST:
+  IMAGES_PER_GPU: 1
+  COCO_BBOX_FILE: ''
+  BBOX_THRE: 1.0
+  IMAGE_THRE: 0.0
+  IN_VIS_THRE: 0.2
+  MODEL_FILE: ''
+  NMS_THRE: 1.0
+  OKS_THRE: 0.9
+  USE_GT_BBOX: true
+  FLIP_TEST: false
+  POST_PROCESS: true
+  SHIFT_HEATMAP: true
+DEBUG:
+  DEBUG: true
+  SAVE_BATCH_IMAGES_GT: true
+  SAVE_BATCH_IMAGES_PRED: true
+  SAVE_HEATMAPS_GT: true
+  SAVE_HEATMAPS_PRED: true
